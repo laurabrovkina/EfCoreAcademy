@@ -6,15 +6,19 @@
 using EfCoreAcademy;
 using EfCoreAcademy.Model;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite().Options;
 var dbContext = new ApplicationDbContext(options);
 
 dbContext.Database.Migrate();
 
-ProcessDelete();
-ProccessInsert();
-ProcessSelect();
+//ProcessDelete();
+//ProccessInsert();
+//ProcessSelect();
+//ProcessUpdate();
+
+ProcessRepository();
 
 void ProcessDelete()
 {
@@ -87,4 +91,40 @@ void ProcessSelect()
     //var professor = dbContext.Professors.Include(x => x.Address).Single(p => p.FirstName == "Jonathon");
     var student1 = dbContext.Students.Include(c => c.Classes).Where(x => x.FirstName == "Maria").ToList();
     dbContext.Dispose();
+}
+
+void ProcessUpdate()
+{
+    var dbContext = new ApplicationDbContext(options);
+
+    var student1 = dbContext.Students.First();
+    student1.FirstName = "Tim";
+    dbContext.SaveChanges();
+
+    dbContext.Dispose();
+
+    dbContext = new ApplicationDbContext(options);
+    student1 = dbContext.Students.First();
+    dbContext.Dispose();
+    Console.ReadLine();
+}
+
+async void ProcessRepository()
+{
+    dbContext = new ApplicationDbContext(options);
+    var repository = new GenericRepository<Student>(dbContext);
+
+    //simple select
+    var students = await repository.GetAsync(null, null);
+    var student = await repository.GetByIdAsync(students.First().Id);
+
+    //Includes
+    student = await repository.GetByIdAsync(student.Id, (student) => student.Address,
+        (student) => student.Classes);
+
+    //Filters
+    Expression<Func<Student, bool>> filter = (student) => student.FirstName == "Maria";
+    students = await repository.GetFilteredAsync(new[] { filter }, null, null);
+
+    Console.ReadLine();
 }
