@@ -1,0 +1,13 @@
+
+*.cache
+
+EfCoreAcademy/obj/
+EfCoreAcademy/bin/
+
+.vs/EfCoreAcademy/DesignTimeBuild/
+
+.vs/EfCoreAcademy/FileContentIndex/
+
+.vs/EfCoreAcademy/v17/
+
+EfCoreAcademy/bin/Debug/net7.0/
